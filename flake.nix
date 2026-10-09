@@ -19,6 +19,8 @@
         cmake
         rustPlatform.bindgenHook
         llvmPackages.libclang
+        pkg-config
+        openssl
       ];
 
       BINDGEN_EXTRA_CLANG_ARGS = "-I${pkgs.glibc.dev}/include";
