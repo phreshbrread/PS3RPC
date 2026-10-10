@@ -15,6 +15,7 @@ Run ``ps3rpc <PS3 IP>`` to start the service.<br>
 Once a game is running on the PS3 with the specified IP, it will show in your Discord status. A message will also be shown on the PS3 system once a connection is established.
 
 ## Known Issues
+- This currently only works when running PS3 games - PSX and PS2 games will not show.
 - A "KLIC: Not in-game!" message will appear when on the PS3 XMB each refresh cycle.
 - Can crash when failing to connect to a PS3 after exiting a game.
 - Quitting the program whilst in-game doesn't forcefully clear the Discord status.
