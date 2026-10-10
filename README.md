@@ -7,6 +7,7 @@ Simply clone the repository, ``cd`` into it and install using ``make install`` o
 Unfortunately there are no pre-built binaries at the current time.
 
 ### Requirements
+- ``cargo`` (if building from source)
 - A jailbroken Playstation 3 system with WebmanMOD installed
 
 ## Usage
