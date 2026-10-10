@@ -16,7 +16,7 @@ Once a game is running on the PS3 with the specified IP, it will show in your Di
 
 ## Known Issues
 - A "KLIC: Not in-game!" message will appear when on the PS3 XMB each refresh cycle.
-- Can crash when failing to connect to a PS3 after .
+- Can crash when failing to connect to a PS3 after exiting a game.
 - Quitting the program whilst in-game doesn't forcefully clear the Discord status.
     - AFAIK this is only an issue on third-party Discord clients that use ARRPC.
 
