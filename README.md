@@ -1,5 +1,5 @@
 # PS3RPC
-Discord rich presence client for the PS3.
+PS3 Discord rich presence client for Linux & Windows.<br>
 Only tested on Linux, but should work on other platforms.
 
 ## Install
