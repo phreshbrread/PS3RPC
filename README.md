@@ -6,6 +6,9 @@ Only tested on Linux, but should work on other platforms.
 Simply clone the repository, ``cd`` into it and install using ``make install`` or ``cargo install --path .``<br>
 Unfortunately there are no pre-built binaries at the current time.
 
+### Requirements
+- A jailbroken Playstation 3 system with WebmanMOD installed
+
 ## Usage
 Run ``ps3rpc <PS3 IP>`` to start the service.<br>
 Once a game is running on the PS3 with the specified IP, it will show in your Discord status. A message will also be shown on the PS3 system once a connection is established.
