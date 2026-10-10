@@ -1,17 +1,43 @@
+use clap::Parser;
+use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity};
 use ps3rpc::*;
 use std::{error::Error, thread, time::Duration};
 
 // http://<PS3 ID>/klic.ps3 is the main Webman info page we need
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let test_config = UserConfig::testing_defaults();
+    let args = Args::parse();
 
-    let webman_url = format!("http://{}/klic.ps3", test_config.ps3_ip);
+    // TODO: Read from config file
+    let user_config = UserConfig::new(&args.ps3_ip, Duration::from_secs(5));
+
+    let mut connection_message_sent = false;
+    let connection_message = format!(
+        "http://{}/notify.ps3mapi?msg=Rich+Presence+connection+established&icon=0&snd=",
+        user_config.ps3_ip
+    );
+    let webman_url = format!("http://{}/klic.ps3", user_config.ps3_ip);
 
     let mut current_game: Option<CurrentGame>;
 
+    // Create Discord IPC Client
+    let mut client = DiscordIpcClient::new("1535304909019418705");
+    client.connect()?;
+
     loop {
-        let id_game_name: Option<String>;
+        // Send connection message to PS3 if we haven't already
+        if !connection_message_sent {
+            match ureq::get(String::from(&connection_message)).call() {
+                Ok(_) => connection_message_sent = true,
+                Err(err) => {
+                    println!("Failed to connect to PS3 ({}): {}", user_config.ps3_ip, err);
+
+                    // Wait for a while and then go to the end of the loop to try again
+                    thread::sleep(Duration::from_secs(20));
+                    continue;
+                }
+            }
+        }
 
         // Handle page manipulation in it's own scope so we can drop whatever we don't need
         {
@@ -25,30 +51,31 @@ fn main() -> Result<(), Box<dyn Error>> {
             } else {
                 let (mut trimmed_page, _) = page.split_once("</H2>").unwrap();
                 (_, trimmed_page) = trimmed_page.split_once("<h2>").unwrap();
-                dbg!(&trimmed_page);
-                current_game = Some(CurrentGame::new(trimmed_page, trimmed_page));
+
+                if trimmed_page.len() > 1 {
+                    let (id, game) = trimmed_page.split_at(10);
+                    current_game = Some(CurrentGame::new(id, game));
+                } else {
+                    current_game = None;
+                }
             }
         }
 
-        // Example id_game_name: NPUB30576 Warhammer 40,000: Space Marine
         println!("Current game: {current_game:?}");
-        thread::sleep(Duration::from_secs(10));
-    }
 
-    //return Ok(());
-}
+        // Update Discord status
+        if let Some(current_game) = current_game {
+            let new_status = activity::Activity::new()
+                .status_display_type(activity::StatusDisplayType::Details)
+                .state(current_game.id)
+                .details(current_game.name);
 
-#[derive(Debug)]
-pub struct CurrentGame {
-   pub id: String,
-   pub name: String,
-}
+            client.set_activity(new_status)?;
+        } else {
+            client.clear_activity()?;
+        }
 
-impl CurrentGame {
-    pub fn new(id: &str, name: &str) -> Self {
-        return CurrentGame {
-            id: id.to_string(),
-            name: name.to_string(),
-        };
+        // Delay before restarting
+        thread::sleep(user_config.sleep_duration);
     }
 }
