@@ -1,6 +1,5 @@
 # PS3RPC
 A lightweight PS3 Discord rich presence client for Linux & Windows.<br>
-Only tested on Linux, but should work on other platforms.
 
 ## Usage
 Run ``ps3rpc <PS3 IP>`` to start the service.<br>
