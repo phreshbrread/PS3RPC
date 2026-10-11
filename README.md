@@ -7,12 +7,20 @@ A custom sleep duration and reconnect attempt delay can be specified after ``<PS
 Once a game is running on the PS3 with the specified IP, it will show in your Discord status. A message will also be shown on the PS3 system once a connection is established.
 
 ## Install
-Simply clone the repository, ``cd`` into it and install using ``make install`` or ``cargo install --path .``<br>
-Unfortunately there are no pre-built binaries at the current time.
+### Linux
+Clone the repository and run ``make install`` or ``cargo install --path .`` inside the repo directory.<br>
+```
+git clone https://github.com/phreshbrread/ps3rpc
+cd ps3rpc
+cargo install --path .
+```
+
+### Windows
+Download the latest ``ps3rpc.exe`` from the [releases](https://github.com/phreshbrread/PS3RPC/releases) page.
 
 ### Requirements
 - ``cargo`` installed (if building from source)
-- A jailbroken Playstation 3 system with webMAN MOD installed
+- A jailbroken PlayStation 3 system with webMAN MOD installed
 
 ## Known Issues
 - A "KLIC: Not in-game!" message will appear when on the PS3 XMB each refresh cycle.
@@ -26,5 +34,4 @@ Unfortunately there are no pre-built binaries at the current time.
 - Loading settings from a config file rather than just CLI args.
 - Cover art for running games.
 - Automatic local system discovery.
-- Optimisations from better string handling.
-- Pre-built binary releases.
+- Small memory optimisations from better string handling.
