@@ -12,7 +12,7 @@ Unfortunately there are no pre-built binaries at the current time.
 
 ### Requirements
 - ``cargo`` installed (if building from source)
-- A jailbroken Playstation 3 system with WebmanMOD installed
+- A jailbroken Playstation 3 system with webMAN MOD installed
 
 ## Known Issues
 - A "KLIC: Not in-game!" message will appear when on the PS3 XMB each refresh cycle.
