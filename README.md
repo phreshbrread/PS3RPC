@@ -24,6 +24,7 @@ Once a game is running on the PS3 with the specified IP, it will show in your Di
 ## To-Do
 - User configurable refresh/update delay.
 - Loading settings from a config file rather than just CLI args.
+- Cover art for running games.
 - Automatic local system discovery.
 - Optimisations from better string handling.
 - Pre-built binary releases.
