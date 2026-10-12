@@ -93,11 +93,23 @@ fn main() -> Result<(), Box<dyn Error>> {
                 &current_game.name, &current_game.id
             );
 
+            // Pull image based on game ID
+            // TODO: Fallback to generic image
+            // TODO: Cache image
+            let dynamic_image_url = format!(
+                "https://raw.githubusercontent.com/aldostools/Resources/main/COV/{}.JPG",
+                current_game.id
+            );
+            dbg!(&dynamic_image_url);
+
+            let assets = activity::Assets::new().large_image(dynamic_image_url);
+
             // Update Discord status
             let new_status = activity::Activity::new()
                 .status_display_type(activity::StatusDisplayType::Details)
                 .state(&current_game.id)
-                .details(&current_game.name);
+                .details(&current_game.name)
+                .assets(assets);
 
             client.set_activity(new_status)?;
         } else {

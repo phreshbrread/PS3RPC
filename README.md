@@ -31,7 +31,7 @@ Download the latest ``ps3rpc.exe`` from the [releases](https://github.com/phresh
     - This is an issue with that client specifically and I am therefore unable to do anything about it.
 
 ## To-Do
+- Cache cover images
 - Loading settings from a config file rather than just CLI args.
-- Cover art for running games.
 - Automatic local system discovery.
 - Small memory optimisations from better string handling.
