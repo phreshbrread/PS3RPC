@@ -21,6 +21,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let cfg_contents = match fs::read_to_string(&config_file_path) {
         Ok(contents) => contents,
         Err(_) => {
+            // TODO: Clean up & extract into functions
             println!("No config file found");
 
             // Create parent directories
@@ -38,19 +39,24 @@ fn main() -> Result<(), Box<dyn Error>> {
             File::create(&config_file_path).unwrap();
 
             // Get PS3 IP
+            let mut input = String::new();
             print!("Please enter PS3 IP address: ");
             std::io::stdout().flush().unwrap();
 
-            let mut input = String::new();
+            // Read line
             std::io::stdin().read_line(&mut input).unwrap();
             dbg!(&input);
+
+            // Copy to boxed string
+            let ip: Box<str> = Box::from(input.trim());
+            dbg!(&ip);
 
             todo!("Get sleep_duration");
 
             todo!("Get reconnect_delay");
 
             // Create new settings struct from user input
-            let cfg = UserConfig::new(input.trim(), Duration::from_secs(10), Duration::from_secs(20));
+            let cfg = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
             dbg!(&cfg);
 
             todo!("Write IP to config");
