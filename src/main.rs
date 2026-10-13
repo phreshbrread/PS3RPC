@@ -61,6 +61,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     dbg!(&cfg_contents);
 
     // Parse toml to struct
+    // TODO: Account for blank IP
     let user_config: UserConfig = toml::from_str(&cfg_contents).unwrap();
     dbg!(&user_config);
 
