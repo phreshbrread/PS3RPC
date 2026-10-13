@@ -41,7 +41,7 @@ impl CurrentGame {
 }
 
 pub fn get_config_path() -> PathBuf {
-    todo!("Platform-agnostic config path");
+    todo!("Use platform-native config path");
     let path = PathBuf::from(
         env::home_dir()
             .unwrap() // $HOME should always be set on Linux
