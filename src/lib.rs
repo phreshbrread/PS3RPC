@@ -1,5 +1,6 @@
 use clap::Parser;
-use std::time::Duration;
+use serde::{Deserialize, Serialize};
+use std::{env, path::PathBuf, time::Duration};
 
 #[derive(Parser, Debug)]
 pub struct Args {
@@ -8,7 +9,7 @@ pub struct Args {
     pub reconnect_delay: Option<u64>,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UserConfig {
     pub ps3_ip: Box<str>,
     pub sleep_duration: Duration,
@@ -38,4 +39,20 @@ impl CurrentGame {
             name: name.to_string(),
         };
     }
+}
+
+pub fn get_config_path() -> PathBuf {
+    let path = PathBuf::from(
+        env::home_dir()
+            .unwrap() // $HOME should always be set on Linux
+            .join(env::var("XDG_CONFIG_HOME").unwrap_or_else(|err| {
+                println!("Failed to read $XDG_CONFIG_HOME: {}", err);
+                println!("Defaulting to ~/.config");
+                String::from(".config")
+            }))
+            .join("ps3rpc")
+            .join("settings.toml"),
+    );
+
+    return path;
 }

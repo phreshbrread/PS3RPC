@@ -1,12 +1,69 @@
 use clap::Parser;
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity};
 use ps3rpc::*;
-use std::{error::Error, thread, time::Duration};
+use std::{error::Error, fs::{self, File}, thread, time::Duration, io::Write};
 
 // http://<PS3 ID>/klic.ps3 is the main Webman info page we need
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let args = Args::parse();
+    //let args = Args::parse();
+    let args = Args {
+        ps3_ip: "192.168.20.8".into(),
+        sleep_duration: None,
+        reconnect_delay: None,
+    };
+
+    // Get config file path
+    let config_file_path = get_config_path();
+    dbg!(&config_file_path);
+
+    // Try to read file to string
+    let cfg_contents = match fs::read_to_string(&config_file_path) {
+        Ok(contents) => contents,
+        Err(_) => {
+            println!("No config file found");
+
+            // Create parent directories
+            let p = config_file_path.parent().unwrap();
+            fs::create_dir_all(p)?;
+
+            // Create new config file
+            File::create(&config_file_path).unwrap();
+
+            // Get PS3 IP
+            print!("Please enter PS3 IP address: ");
+            std::io::stdout().flush().unwrap();
+
+            // Create parent directories
+            let p = config_file_path.parent().unwrap();
+            fs::create_dir_all(p)?;
+
+            // Create new config file
+            File::create(&config_file_path).unwrap();
+
+            // Get PS3 IP
+            print!("Please enter PS3 IP address: ");
+
+            let mut input = String::new();
+            std::io::stdin().read_line(&mut input).unwrap();
+            dbg!(&input);
+
+            todo!("Get sleep_duration");
+
+            todo!("Get reconnect_delay");
+
+            // Create new settings struct from user input
+            let cfg = UserConfig::new(input.trim(), Duration::from_secs(10), Duration::from_secs(20));
+            dbg!(&cfg);
+
+            todo!("Write IP to config");
+        }
+    };
+    dbg!(&cfg_contents);
+
+    // Parse toml to struct
+    let config_file_settings: UserConfig = toml::from_str(&cfg_contents).unwrap();
+    dbg!(&config_file_settings);
 
     // TODO: Read from config file
     let user_config = UserConfig::new(
