@@ -1,13 +1,12 @@
-use clap::Parser;
 use serde::{Deserialize, Serialize};
-use std::{env, path::PathBuf, time::Duration};
+use std::{env, io::Write, path::PathBuf, time::Duration};
 
-#[derive(Parser, Debug)]
-pub struct Args {
-    pub ps3_ip: Box<str>,
-    pub sleep_duration: Option<u64>,
-    pub reconnect_delay: Option<u64>,
-}
+// #[derive(Parser, Debug)]
+// pub struct Args {
+//     pub ps3_ip: Box<str>,
+//     pub sleep_duration: Option<u64>,
+//     pub reconnect_delay: Option<u64>,
+// }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserConfig {
@@ -55,4 +54,16 @@ pub fn get_config_path() -> PathBuf {
     );
 
     return path;
+}
+
+pub fn print_flush_buffer(str: &str) {
+    print!("{}", str);
+    std::io::stdout().flush().unwrap();
+}
+
+pub fn read_line_as_string() -> String {
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input).unwrap();
+
+    return input;
 }

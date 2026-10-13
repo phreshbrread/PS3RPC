@@ -1,23 +1,22 @@
-use clap::Parser;
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity};
 use ps3rpc::*;
-use std::{error::Error, fs::{self, File}, thread, time::Duration, io::Write};
+use std::{
+    error::Error,
+    fs::{self, File},
+    process, thread,
+    time::Duration,
+};
 
 // http://<PS3 ID>/klic.ps3 is the main Webman info page we need
 
 fn main() -> Result<(), Box<dyn Error>> {
-    //let args = Args::parse();
-    let args = Args {
-        ps3_ip: "192.168.20.8".into(),
-        sleep_duration: None,
-        reconnect_delay: None,
-    };
+    let user_config: UserConfig;
 
     // Get config file path
     let config_file_path = get_config_path();
     dbg!(&config_file_path);
 
-    // Try to read file to string
+    // Try to read from config file to a string
     let cfg_contents = match fs::read_to_string(&config_file_path) {
         Ok(contents) => contents,
         Err(_) => {
@@ -38,42 +37,32 @@ fn main() -> Result<(), Box<dyn Error>> {
             // Create new config file
             File::create(&config_file_path).unwrap();
 
-            // Get PS3 IP
-            let mut input = String::new();
-            print!("Please enter PS3 IP address: ");
-            std::io::stdout().flush().unwrap();
-
-            // Read line
-            std::io::stdin().read_line(&mut input).unwrap();
-            dbg!(&input);
-
-            // Copy to boxed string
-            let ip: Box<str> = Box::from(input.trim());
+            // Get PS3 IP as trimmed, boxed str
+            print_flush_buffer("Please enter PS3 IP: ");
+            let ip: Box<str> = Box::from(read_line_as_string().trim());
             dbg!(&ip);
 
-            todo!("Get sleep_duration");
+            // Create new settings struct with user-specified IP
+            user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
+            dbg!(&user_config);
 
-            todo!("Get reconnect_delay");
+            // Write new user_config struct to file for next time
+            let toml_str = toml::to_string(&user_config).unwrap();
+            dbg!(&toml_str);
+            if let Err(err) = std::fs::write(config_file_path, &toml_str) {
+                println!("Failed to write config file: {err}");
+                process::exit(1);
+            }
 
-            // Create new settings struct from user input
-            let cfg = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
-            dbg!(&cfg);
-
-            todo!("Write IP to config");
+            // Return the toml string as we parse it later
+            toml_str
         }
     };
     dbg!(&cfg_contents);
 
     // Parse toml to struct
-    let config_file_settings: UserConfig = toml::from_str(&cfg_contents).unwrap();
-    dbg!(&config_file_settings);
-
-    // TODO: Read from config file
-    let user_config = UserConfig::new(
-        &args.ps3_ip,
-        Duration::from_secs(args.sleep_duration.unwrap_or(10)),
-        Duration::from_secs(args.reconnect_delay.unwrap_or(20)),
-    );
+    let user_config: UserConfig = toml::from_str(&cfg_contents).unwrap();
+    dbg!(&user_config);
 
     let mut connected_to_ps3 = false;
     let connection_message = format!(
@@ -86,7 +75,14 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Create Discord IPC Client
     let mut client = DiscordIpcClient::new("1535304909019418705");
-    client.connect()?;
+    match client.connect() {
+        Ok(()) => (),
+        Err(err) => {
+            println!("Failed to connect to Discord IPC: {err}");
+            println!("Please make sure Discord is running");
+            process::exit(1);
+        }
+    }
 
     loop {
         // TODO: Consolidate connection attempts
