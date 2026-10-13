@@ -30,10 +30,6 @@ fn main() -> Result<(), Box<dyn Error>> {
             // Create new config file
             File::create(&config_file_path).unwrap();
 
-            // Get PS3 IP
-            print!("Please enter PS3 IP address: ");
-            std::io::stdout().flush().unwrap();
-
             // Create parent directories
             let p = config_file_path.parent().unwrap();
             fs::create_dir_all(p)?;
@@ -43,6 +39,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             // Get PS3 IP
             print!("Please enter PS3 IP address: ");
+            std::io::stdout().flush().unwrap();
 
             let mut input = String::new();
             std::io::stdin().read_line(&mut input).unwrap();
