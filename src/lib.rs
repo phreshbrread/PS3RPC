@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::{env, io::Write, path::PathBuf, time::Duration};
+use std::{io::Write, path::PathBuf, time::Duration};
 
 // #[derive(Parser, Debug)]
 // pub struct Args {
@@ -40,21 +40,10 @@ impl CurrentGame {
     }
 }
 
-pub fn get_config_path() -> PathBuf {
-    todo!("Use platform-native config path");
-    let path = PathBuf::from(
-        env::home_dir()
-            .unwrap() // $HOME should always be set on Linux
-            .join(env::var("XDG_CONFIG_HOME").unwrap_or_else(|err| {
-                println!("Failed to read $XDG_CONFIG_HOME: {}", err);
-                println!("Defaulting to ~/.config");
-                String::from(".config")
-            }))
-            .join("ps3rpc")
-            .join("settings.toml"),
-    );
+pub fn get_config_path() -> Option<PathBuf> {
+    let path = dirs::config_dir()?.join("ps3rpc").join("settings.toml");
 
-    return path;
+    return Some(path);
 }
 
 pub fn print_flush_buffer(str: &str) {
@@ -67,4 +56,23 @@ pub fn read_line_as_string() -> String {
     std::io::stdin().read_line(&mut input).unwrap();
 
     return input;
+}
+
+/* --- Custom Errors --- */
+#[derive(Debug)]
+pub enum ConfigWriteError {
+    TomlSerError(toml::ser::Error),
+    IoError(std::io::Error),
+}
+
+impl From<toml::ser::Error> for ConfigWriteError {
+    fn from(value: toml::ser::Error) -> Self {
+        ConfigWriteError::TomlSerError(value)
+    }
+}
+
+impl From<std::io::Error> for ConfigWriteError {
+    fn from(value: std::io::Error) -> Self {
+        ConfigWriteError::IoError(value)
+    }
 }

@@ -13,7 +13,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let user_config: UserConfig;
 
     // Get config file path
-    let config_file_path = get_config_path();
+    let Some(config_file_path) = get_config_path() else {
+        println!("Failed to get config file path.");
+        process::exit(1);
+    };
     dbg!(&config_file_path);
 
     // Try to read from config file to a string
@@ -21,7 +24,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Ok(contents) => contents,
         Err(_) => {
             // TODO: Clean up & extract into functions
-            println!("No config file found");
+            println!("No config file found.");
 
             // Create parent directories
             let p = config_file_path.parent().unwrap();
@@ -46,7 +49,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
             dbg!(&user_config);
 
-            // Write new user_config struct to file for next time
+            // Write new user_config struct to file for later
             let toml_str = toml::to_string(&user_config).unwrap();
             dbg!(&toml_str);
             if let Err(err) = std::fs::write(config_file_path, &toml_str) {
