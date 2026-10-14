@@ -65,7 +65,13 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Parse toml to struct
     // TODO: Account for blank IP
-    let user_config: UserConfig = toml::from_str(&cfg_contents).unwrap();
+    let user_config: UserConfig = match toml::from_str(&cfg_contents) {
+        Ok(contents) => contents,
+        Err(err) => {
+            println!("Failed to read settings.toml: {err}");
+            process::exit(1);
+        }
+    };
     dbg!(&user_config);
 
     let mut connected_to_ps3 = false;
