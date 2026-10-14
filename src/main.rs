@@ -1,3 +1,6 @@
+// TODO BEFORE MERGE:
+// Recover broken ip without deleting config
+
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity};
 use ps3rpc::*;
 use std::{
