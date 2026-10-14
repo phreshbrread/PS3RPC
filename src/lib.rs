@@ -1,5 +1,9 @@
 use serde::{Deserialize, Serialize};
-use std::{io::Write, path::PathBuf, time::Duration};
+use std::{
+    io::{self, Write},
+    path::PathBuf,
+    time::Duration,
+};
 
 // #[derive(Parser, Debug)]
 // pub struct Args {
@@ -56,6 +60,10 @@ pub fn read_line_as_string() -> String {
     std::io::stdin().read_line(&mut input).unwrap();
 
     return input;
+}
+
+pub fn any_key_continue() {
+    let _ = io::stdin().read_line(&mut String::new());
 }
 
 /* --- Custom Errors --- */

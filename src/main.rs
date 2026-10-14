@@ -16,6 +16,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Get config file path
     let Some(config_file_path) = get_config_path() else {
         println!("Failed to get config file path.");
+        any_key_continue();
         process::exit(1);
     };
     dbg!(&config_file_path);
@@ -56,6 +57,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             dbg!(&toml_str);
             if let Err(err) = std::fs::write(config_file_path, &toml_str) {
                 println!("Failed to write config file: {err}");
+                any_key_continue();
                 process::exit(1);
             }
 
@@ -71,6 +73,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Ok(contents) => contents,
         Err(err) => {
             println!("Failed to read settings.toml: {err}");
+            any_key_continue();
             process::exit(1);
         }
     };
@@ -92,6 +95,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         Err(err) => {
             println!("Failed to connect to Discord IPC: {err}");
             println!("Please make sure Discord is running");
+            any_key_continue();
             process::exit(1);
         }
     }
