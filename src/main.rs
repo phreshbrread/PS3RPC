@@ -43,10 +43,18 @@ fn main() -> Result<(), Box<dyn Error>> {
             // Create new config file
             File::create(&config_file_path).unwrap();
 
-            // Get PS3 IP as trimmed, boxed str
-            print_flush_buffer("Please enter PS3 IP: ");
-            let ip: Box<str> = Box::from(read_line_as_string().trim());
-            dbg!(&ip);
+            let mut ip: Box<str>;
+            loop {
+                // Get PS3 IP as trimmed, boxed str
+                print_flush_buffer("Please enter PS3 IP: ");
+                ip = Box::from(read_line_as_string().trim());
+                dbg!(&ip);
+
+                // Shortest possible IP is 7 characters long
+                if ip.len() > 7 {
+                    break;
+                }
+            }
 
             // Create new settings struct with user-specified IP
             user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
