@@ -19,7 +19,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         any_key_continue();
         process::exit(1);
     };
-    dbg!(&config_file_path);
 
     // Try to read from config file to a string
     let cfg_contents = match fs::read_to_string(&config_file_path) {
@@ -37,7 +36,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                 // Get PS3 IP as trimmed, boxed str
                 print_flush_buffer("Please enter PS3 IP: ");
                 ip = Box::from(read_line_as_string().trim());
-                dbg!(&ip);
 
                 // Shortest possible IP is 7 characters long
                 if ip.len() > 7 {
@@ -47,14 +45,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             // Create new settings struct with user-specified IP
             user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
-            dbg!(&user_config);
 
             // Create new config file
             File::create(&config_file_path).unwrap();
 
             // Write new user_config struct to file for later
             let toml_str = toml::to_string(&user_config).unwrap();
-            dbg!(&toml_str);
             if let Err(err) = std::fs::write(config_file_path, &toml_str) {
                 println!("Failed to write config file: {err}");
                 any_key_continue();
@@ -65,7 +61,6 @@ fn main() -> Result<(), Box<dyn Error>> {
             toml_str
         }
     };
-    dbg!(&cfg_contents);
 
     // Parse toml to struct
     // TODO: Account for blank IP
@@ -77,7 +72,6 @@ fn main() -> Result<(), Box<dyn Error>> {
             process::exit(1);
         }
     };
-    dbg!(&user_config);
 
     let mut connected_to_ps3 = false;
     let connection_message = format!(
@@ -172,7 +166,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                 "https://raw.githubusercontent.com/aldostools/Resources/main/COV/{}.JPG",
                 current_game.id
             );
-            dbg!(&dynamic_image_url);
 
             let assets = activity::Assets::new().large_image(dynamic_image_url);
 
