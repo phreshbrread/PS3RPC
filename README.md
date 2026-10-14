@@ -6,6 +6,10 @@ Run ``ps3rpc`` to start the service.<br>
 If the PS3's IP is not already set in ``settings.toml``, you will be prompted to enter it.<br>
 Once a game is running on the PS3 with the specified IP, it will show in your Discord status. A message will also be shown on the PS3 system once a connection is established.
 
+## Requirements
+- ``cargo`` installed (if building from source)
+- A jailbroken PlayStation 3 system with webMAN MOD installed
+
 ## Install
 ### Linux
 Clone the repository and run ``make install`` or ``cargo install --path .`` inside the repo directory.<br>
@@ -17,10 +21,6 @@ cargo install --path .
 
 ### Windows
 Download the latest ``ps3rpc.exe`` from the [releases](https://github.com/phreshbrread/PS3RPC/releases) page.
-
-### Requirements
-- ``cargo`` installed (if building from source)
-- A jailbroken PlayStation 3 system with webMAN MOD installed
 
 ## Known Issues
 - A "KLIC: Not in-game!" message will appear when on the PS3 XMB each refresh cycle.
