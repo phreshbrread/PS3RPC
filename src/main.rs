@@ -1,6 +1,3 @@
-// TODO BEFORE MERGE:
-// Recover broken ip without deleting config
-
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity};
 use ps3rpc::*;
 use std::{
@@ -12,6 +9,7 @@ use std::{
 
 // http://<PS3 ID>/klic.ps3 is the main Webman info page we need
 
+// TODO: Allow for changing IP without touching config file
 fn main() -> Result<(), Box<dyn Error>> {
     let user_config: UserConfig;
 
@@ -33,16 +31,6 @@ fn main() -> Result<(), Box<dyn Error>> {
             let p = config_file_path.parent().unwrap();
             fs::create_dir_all(p)?;
 
-            // Create new config file
-            File::create(&config_file_path).unwrap();
-
-            // Create parent directories
-            let p = config_file_path.parent().unwrap();
-            fs::create_dir_all(p)?;
-
-            // Create new config file
-            File::create(&config_file_path).unwrap();
-
             let mut ip: Box<str>;
             loop {
                 // Get PS3 IP as trimmed, boxed str
@@ -59,6 +47,9 @@ fn main() -> Result<(), Box<dyn Error>> {
             // Create new settings struct with user-specified IP
             user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
             dbg!(&user_config);
+
+            // Create new config file
+            File::create(&config_file_path).unwrap();
 
             // Write new user_config struct to file for later
             let toml_str = toml::to_string(&user_config).unwrap();
