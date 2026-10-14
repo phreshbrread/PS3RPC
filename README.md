@@ -3,7 +3,7 @@ A lightweight PS3 Discord rich presence client for Linux & Windows.<br>
 
 ## Usage
 Run ``ps3rpc`` to start the service.<br>
-If the PS3's IP is not already set in ``settings.toml``, you will be prompted to enter it.
+If the PS3's IP is not already set in ``settings.toml``, you will be prompted to enter it.<br>
 Once a game is running on the PS3 with the specified IP, it will show in your Discord status. A message will also be shown on the PS3 system once a connection is established.
 
 ## Install
