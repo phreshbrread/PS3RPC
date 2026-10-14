@@ -63,6 +63,7 @@ pub fn read_line_as_string() -> String {
 }
 
 pub fn any_key_continue() {
+    print_flush_buffer("Press enter to continue.");
     let _ = io::stdin().read_line(&mut String::new());
 }
 
