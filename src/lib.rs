@@ -50,6 +50,12 @@ pub fn get_config_path() -> Option<PathBuf> {
     return Some(path);
 }
 
+pub fn get_cache_path() -> Option<PathBuf> {
+    let path = dirs::cache_dir()?.join("ps3rpc");
+
+    return Some(path);
+}
+
 pub fn print_flush_buffer(str: &str) {
     print!("{}", str);
     std::io::stdout().flush().unwrap();
