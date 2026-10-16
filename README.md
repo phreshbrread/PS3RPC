@@ -32,6 +32,5 @@ Download the latest ``ps3rpc.exe`` from the [releases](https://github.com/phresh
 
 ## To-Do
 - Retry when failing to connect to Discord IPC.
-- Cache cover images.
 - Automatic local system discovery.
 - Small memory optimisations from better string handling.
