@@ -1,12 +1,16 @@
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity};
 use ps3rpc::*;
 use std::{
-    error::Error, fs::{self, File}, net::{Ipv4Addr, Ipv6Addr}, process, thread, time::Duration
+    error::Error,
+    fs::{self, File},
+    process, thread,
+    time::Duration,
 };
 
 // http://<PS3 ID>/klic.ps3 is the main Webman info page we need
 
 // TODO: Allow for changing IP without touching config file
+// Do this with a --new-ip flag or something
 fn main() -> Result<(), Box<dyn Error>> {
     let user_config: UserConfig;
 
