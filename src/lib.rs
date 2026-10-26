@@ -4,13 +4,15 @@ use std::{
     path::PathBuf,
     time::Duration,
 };
+use clap::Parser;
 
-// #[derive(Parser, Debug)]
-// pub struct Args {
-//     pub ps3_ip: Box<str>,
-//     pub sleep_duration: Option<u64>,
-//     pub reconnect_delay: Option<u64>,
-// }
+#[derive(Parser, Debug)]
+#[command(version)]
+pub struct Args {
+    /// Set new PS3 IP address to use
+    #[arg(short, long)]
+    pub new_ip: Option<String>,
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserConfig {
