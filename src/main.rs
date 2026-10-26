@@ -1,3 +1,4 @@
+use clap::Parser;
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity};
 use ps3rpc::*;
 use std::{
@@ -6,7 +7,6 @@ use std::{
     process, thread,
     time::Duration,
 };
-use clap::Parser;
 
 // http://<PS3 ID>/klic.ps3 is the main Webman info page we need
 
@@ -24,10 +24,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     };
 
     // Try to read from config file to a string
+    // TODO: Extract into functions
     let cfg_contents = match fs::read_to_string(&config_file_path) {
         Ok(contents) => contents,
         Err(_) => {
-            // TODO: Clean up & extract into functions
             println!("No config file found.");
 
             // Create parent directories
@@ -35,6 +35,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             fs::create_dir_all(p)?;
 
             let mut ip: Box<str>;
+
             loop {
                 // Get PS3 IP as trimmed, boxed str
                 print_flush_buffer("Please enter PS3 IP: ");

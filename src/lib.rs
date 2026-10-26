@@ -1,17 +1,17 @@
+use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::{
     io::{self, Write},
     path::PathBuf,
     time::Duration,
 };
-use clap::Parser;
 
 #[derive(Parser, Debug)]
 #[command(version)]
 pub struct Args {
     /// Set new PS3 IP address to use
     #[arg(short, long)]
-    pub new_ip: Option<String>,
+    pub new_ip: Option<Box<str>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -56,6 +56,15 @@ pub fn get_cache_path() -> Option<PathBuf> {
     let path = dirs::cache_dir()?.join("ps3rpc");
 
     return Some(path);
+}
+
+pub fn load_user_config() -> Result<UserConfig, ()> {
+    // TODO
+    Err(())
+}
+
+pub fn save_user_config() {
+    // TODO
 }
 
 pub fn print_flush_buffer(str: &str) {
