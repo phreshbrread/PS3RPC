@@ -14,13 +14,16 @@ use std::{
 // Do this with a --new-ip flag or something
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
-    let user_config: UserConfig;
 
     // Get config file path
     let Some(config_file_path) = get_config_path() else {
         println!("Failed to get config file path.");
         any_key_continue();
         process::exit(1);
+    };
+
+    let Ok(mut user_config) = load_user_config(&config_file_path) else {
+        todo!();
     };
 
     // Try to read from config file to a string

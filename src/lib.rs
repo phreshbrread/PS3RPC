@@ -1,7 +1,10 @@
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::{
-    error::Error, io::{self, Write}, path::PathBuf, time::Duration
+    error::Error,
+    io::{self, Write},
+    path::PathBuf,
+    time::Duration,
 };
 
 #[derive(Parser, Debug)]
@@ -61,7 +64,7 @@ pub fn create_empty_config() -> Result<(), Box<dyn Error>> {
 }
 
 pub fn load_user_config(path: &PathBuf) -> Result<UserConfig, ConfigReadError> {
-    let cfg_contents = std::fs::read_to_string(&path)?;
+    let cfg_string: String = std::fs::read_to_string(&path)?;
     /*
     let cfg_contents = match fs::read_to_string(&config_file_path) {
         Ok(contents) => contents,
@@ -104,19 +107,9 @@ pub fn load_user_config(path: &PathBuf) -> Result<UserConfig, ConfigReadError> {
         }
     };
     */
-    let cfg = toml::from_str(&cfg_contents)?;
+    let cfg = toml::from_str(&cfg_string)?;
 
     Ok(cfg)
-    /*
-    let user_config: UserConfig = match toml::from_str(&cfg_contents) {
-        Ok(contents) => contents,
-        Err(err) => {
-            println!("Failed to read settings.toml: {err}");
-            any_key_continue();
-            process::exit(1);
-        }
-    };
-    */
 }
 
 pub fn save_user_config(cfg: &UserConfig) {
