@@ -5,6 +5,7 @@ use std::{
     io::{self, Write},
     path::PathBuf,
     time::Duration,
+    fs,
 };
 
 #[derive(Parser, Debug)]
@@ -59,60 +60,27 @@ pub fn get_cache_path() -> Option<PathBuf> {
     return Some(path);
 }
 
+
+pub fn create_config_dir(path: &PathBuf) -> Result<(), std::io::Error> {
+    let p = path.parent().unwrap();
+    fs::create_dir_all(p)?;
+
+    Ok(())
+}
+
 pub fn create_empty_config() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
 pub fn load_user_config(path: &PathBuf) -> Result<UserConfig, ConfigReadError> {
-    let cfg_string: String = std::fs::read_to_string(&path)?;
-    /*
-    let cfg_contents = match fs::read_to_string(&config_file_path) {
-        Ok(contents) => contents,
-        Err(_) => {
-            println!("No config file found.");
+    let cfg_string: String = fs::read_to_string(&path)?;
 
-            // Create parent directories
-            let p = config_file_path.parent().unwrap();
-            fs::create_dir_all(p)?;
-
-            let mut ip: Box<str>;
-
-            loop {
-                // Get PS3 IP as trimmed, boxed str
-                print_flush_buffer("Please enter PS3 IP: ");
-                ip = Box::from(read_line_as_string().trim());
-
-                // Shortest possible IP is 7 characters long
-                if ip.len() > 7 {
-                    break;
-                }
-            }
-
-            // Create new settings struct with user-specified IP
-            user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
-
-            // Create new config file
-            File::create(&config_file_path).unwrap();
-
-            // Write new user_config struct to file for later
-            let toml_str = toml::to_string(&user_config).unwrap();
-            if let Err(err) = std::fs::write(config_file_path, &toml_str) {
-                println!("Failed to write config file: {err}");
-                any_key_continue();
-                process::exit(1);
-            }
-
-            // Return the toml string as we parse it later
-            toml_str
-        }
-    };
-    */
     let cfg = toml::from_str(&cfg_string)?;
 
     Ok(cfg)
 }
 
-pub fn save_user_config(cfg: &UserConfig) {
+pub fn save_user_config(cfg: &UserConfig, path: &PathBuf) {
     // TODO
 }
 

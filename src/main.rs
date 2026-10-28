@@ -10,8 +10,8 @@ use std::{
 
 // http://<PS3 ID>/klic.ps3 is the main Webman info page we need
 
-// TODO: Allow for changing IP without touching config file
-// Do this with a --new-ip flag or something
+/* TODO: Allow for changing IP without touching config file
+ * Do this with a --new-ip flag or something */
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
 
@@ -22,63 +22,67 @@ fn main() -> Result<(), Box<dyn Error>> {
         process::exit(1);
     };
 
-    let Ok(mut user_config) = load_user_config(&config_file_path) else {
-        todo!();
-    };
+    // TODO: Clean up (forgot how to rn)
+    match create_config_dir(&config_file_path) {
+        Ok(()) => (),
+        Err(err) => {
+            println!("Failed to create config file directory: {err}");
+            process::exit(1);
+        }
+    }
 
     // Try to read from config file to a string
-    // TODO: Extract into functions
-    let cfg_contents = match fs::read_to_string(&config_file_path) {
-        Ok(contents) => contents,
-        Err(_) => {
-            println!("No config file found.");
+    let Ok(mut user_config) = load_user_config(&config_file_path) else {
+        println!("No config file found.");
 
-            // Create parent directories
-            let p = config_file_path.parent().unwrap();
-            fs::create_dir_all(p)?;
+        /*
 
-            let mut ip: Box<str>;
+           let mut ip: Box<str>;
 
-            loop {
-                // Get PS3 IP as trimmed, boxed str
-                print_flush_buffer("Please enter PS3 IP: ");
-                ip = Box::from(read_line_as_string().trim());
+           loop {
+        // Get PS3 IP as trimmed, boxed str
+        print_flush_buffer("Please enter PS3 IP: ");
+        ip = Box::from(read_line_as_string().trim());
 
-                // Shortest possible IP is 7 characters long
-                if ip.len() > 7 {
-                    break;
-                }
-            }
-
-            // Create new settings struct with user-specified IP
-            user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
-
-            // Create new config file
-            File::create(&config_file_path).unwrap();
-
-            // Write new user_config struct to file for later
-            let toml_str = toml::to_string(&user_config).unwrap();
-            if let Err(err) = std::fs::write(config_file_path, &toml_str) {
-                println!("Failed to write config file: {err}");
-                any_key_continue();
-                process::exit(1);
-            }
-
-            // Return the toml string as we parse it later
-            toml_str
+        // Shortest possible IP is 7 characters long
+        if ip.len() > 7 {
+        break;
         }
+        }
+
+        // Create new settings struct with user-specified IP
+        user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
+
+        // Create new config file
+        File::create(&config_file_path).unwrap();
+
+        // Write new user_config struct to file for later
+        let toml_str = toml::to_string(&user_config).unwrap();
+        if let Err(err) = std::fs::write(config_file_path, &toml_str) {
+        println!("Failed to write config file: {err}");
+        any_key_continue();
+        process::exit(1);
+        }
+
+        // Return the toml string as we parse it later
+        toml_str
+        */
+
+        todo!("Handle missing config");
     };
+
+    dbg!(&user_config);
 
     // Parse toml to struct
     // TODO: Account for blank IP
-    let user_config: UserConfig = match toml::from_str(&cfg_contents) {
-        Ok(contents) => contents,
-        Err(err) => {
-            println!("Failed to read settings.toml: {err}");
-            any_key_continue();
-            process::exit(1);
-        }
-    };
+    //let user_config: UserConfig = match toml::from_str(&cfg_contents) {
+    //    Ok(contents) => contents,
+    //    Err(err) => {
+    //        println!("Failed to read settings.toml: {err}");
+    //        any_key_continue();
+    //        process::exit(1);
+    //    }
+    //};
 
     let mut connected_to_ps3 = false;
     let connection_message = format!(
