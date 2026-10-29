@@ -83,7 +83,7 @@ pub fn load_user_config(path: &PathBuf) -> Result<UserConfig, ConfigReadError> {
 }
 
 pub fn save_user_config(cfg: &UserConfig, path: &PathBuf) {
-    // TODO
+    todo!();
 }
 
 pub fn flushed_print(str: &str) {

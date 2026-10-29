@@ -18,18 +18,17 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Get config file path
     let Some(config_file_path) = get_config_path() else {
-        die("Failed to get config file path");
+        die("ERROR: Failed to get config file path");
     };
 
     // Try to read from config file to a string
     let Ok(user_config) = load_user_config(&config_file_path) else {
         /* --- If config doesn't exist --- */
-        println!("No config file found.");
-        println!("Creating a new one.");
+        println!("WARNING: No config file found. Creating a new one.");
 
         // Create new folder & file
         if let Err(err) = create_empty_config(&config_file_path) {
-            die(format!("Failed to create new config file: {err}").as_str());
+            die(format!("ERROR: Failed to create new config file: {err}").as_str());
         }
 
         // Get PS3 IP as trimmed, boxed str
@@ -52,7 +51,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         // Write new user_config struct to file for later
         let toml_str = toml::to_string(&user_config).unwrap();
         if let Err(err) = std::fs::write(config_file_path, &toml_str) {
-            die(format!("Failed to write config file: {err}").as_str());
+            die(format!("ERROR: Failed to write config file: {err}").as_str());
         }
 
         /*
@@ -92,16 +91,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         Ok(()) => (),
         Err(err) => {
             die(format!(
-                "Failed to connect to Discord IPC: {err}\n\
-                Please make sure Discord is running."
+                "ERROR: Failed to connect to Discord IPC: {err}\n\
+                Please make sure Discord and/or ARRPC is running."
             )
             .as_str());
-            /*
-            println!("Failed to connect to Discord IPC: {err}");
-            println!("Please make sure Discord is running");
-            any_key_continue();
-            process::exit(1);
-            */
         }
     }
 
