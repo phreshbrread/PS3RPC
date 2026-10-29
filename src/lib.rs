@@ -1,11 +1,10 @@
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::{
-    error::Error,
+    fs,
     io::{self, Write},
     path::PathBuf,
     time::Duration,
-    fs,
 };
 
 #[derive(Parser, Debug)]
@@ -60,7 +59,6 @@ pub fn get_cache_path() -> Option<PathBuf> {
     return Some(path);
 }
 
-
 pub fn create_config_dir(path: &PathBuf) -> Result<(), std::io::Error> {
     let p = path.parent().unwrap();
     fs::create_dir_all(p)?;
@@ -68,7 +66,11 @@ pub fn create_config_dir(path: &PathBuf) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-pub fn create_empty_config() -> Result<(), Box<dyn Error>> {
+pub fn create_empty_config(path: &PathBuf) -> Result<(), io::Error> {
+    // Create the path first, then create the file
+    create_config_dir(&path)?;
+    fs::File::create(&path)?;
+
     Ok(())
 }
 
@@ -84,7 +86,7 @@ pub fn save_user_config(cfg: &UserConfig, path: &PathBuf) {
     // TODO
 }
 
-pub fn print_flush_buffer(str: &str) {
+pub fn flushed_print(str: &str) {
     print!("{}", str);
     std::io::stdout().flush().unwrap();
 }
@@ -97,7 +99,7 @@ pub fn read_line_as_string() -> String {
 }
 
 pub fn any_key_continue() {
-    print_flush_buffer("Press enter to continue.");
+    flushed_print("Press enter to continue.");
     let _ = io::stdin().read_line(&mut String::new());
 }
 

@@ -12,57 +12,56 @@ use std::{
 
 /* TODO: Allow for changing IP without touching config file
  * Do this with a --new-ip flag or something */
+pub fn die(msg: &str) -> ! {
+    println!("{msg}");
+    any_key_continue();
+    process::exit(1);
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
+    dbg!(&args);
 
     // Get config file path
     let Some(config_file_path) = get_config_path() else {
-        println!("Failed to get config file path.");
-        any_key_continue();
-        process::exit(1);
+        die("Failed to get config file path");
     };
 
-    // TODO: Clean up (forgot how to rn)
-    match create_config_dir(&config_file_path) {
-        Ok(()) => (),
-        Err(err) => {
-            println!("Failed to create config file directory: {err}");
-            process::exit(1);
-        }
-    }
-
     // Try to read from config file to a string
-    let Ok(mut user_config) = load_user_config(&config_file_path) else {
+    let Ok(user_config) = load_user_config(&config_file_path) else {
+        /* --- If config doesn't exist --- */
         println!("No config file found.");
+        println!("Creating a new one.");
 
-        /*
+        // Create new folder & file
+        if let Err(err) = create_empty_config(&config_file_path) {
+            die(format!("Failed to create new config file: {err}").as_str());
+        }
 
-           let mut ip: Box<str>;
-
-           loop {
         // Get PS3 IP as trimmed, boxed str
-        print_flush_buffer("Please enter PS3 IP: ");
-        ip = Box::from(read_line_as_string().trim());
+        let mut ip: Box<str>;
+        loop {
+            flushed_print("Please enter PS3 IP: ");
+            ip = Box::from(read_line_as_string().trim());
 
-        // Shortest possible IP is 7 characters long
-        if ip.len() > 7 {
-        break;
+            // Shortest possible IP is 7 characters long
+            if ip.len() >= 7 {
+                break;
+            }
         }
-        }
+
+        dbg!(&ip);
 
         // Create new settings struct with user-specified IP
-        user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
-
-        // Create new config file
-        File::create(&config_file_path).unwrap();
+        let user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
 
         // Write new user_config struct to file for later
         let toml_str = toml::to_string(&user_config).unwrap();
         if let Err(err) = std::fs::write(config_file_path, &toml_str) {
-        println!("Failed to write config file: {err}");
-        any_key_continue();
-        process::exit(1);
+            die(format!("Failed to write config file: {err}").as_str());
         }
+
+        /*
 
         // Return the toml string as we parse it later
         toml_str
@@ -98,10 +97,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     match client.connect() {
         Ok(()) => (),
         Err(err) => {
+            die(format!(
+                "Failed to connect to Discord IPC: {err}\n\
+                Please make sure Discord is running."
+            )
+            .as_str());
+            /*
             println!("Failed to connect to Discord IPC: {err}");
             println!("Please make sure Discord is running");
             any_key_continue();
             process::exit(1);
+            */
         }
     }
 
@@ -123,7 +129,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                         err.into_io()
                     );
 
-                    // Wait for a while and then go to the end of the loop to try again
+                    // Wait for a while and then end the main loop early to try again
                     thread::sleep(user_config.reconnect_delay);
                     continue;
                 }
@@ -163,6 +169,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
 
+        // The following only runs if current_game is Some()
         if let Some(current_game) = current_game {
             // Output to terminal
             println!(
@@ -171,13 +178,13 @@ fn main() -> Result<(), Box<dyn Error>> {
             );
 
             // Pull image based on game ID
-            // TODO: Fallback to generic image
-            // TODO: Cache image
+            // TODO: Fallback to generic image if needed
             let dynamic_image_url = format!(
                 "https://raw.githubusercontent.com/aldostools/Resources/main/COV/{}.JPG",
                 current_game.id
             );
 
+            // Create image asset for status
             let assets = activity::Assets::new().large_image(dynamic_image_url);
 
             // Update Discord status
