@@ -12,12 +12,6 @@ use std::{
 
 /* TODO: Allow for changing IP without touching config file
  * Do this with a --new-ip flag or something */
-pub fn die(msg: &str) -> ! {
-    println!("{msg}");
-    any_key_continue();
-    process::exit(1);
-}
-
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
     dbg!(&args);

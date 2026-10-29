@@ -103,6 +103,12 @@ pub fn any_key_continue() {
     let _ = io::stdin().read_line(&mut String::new());
 }
 
+pub fn die(msg: &str) -> ! {
+    println!("{msg}");
+    any_key_continue();
+    std::process::exit(1);
+}
+
 /* --- Custom Errors --- */
 #[derive(Debug)]
 pub enum ConfigWriteError {
