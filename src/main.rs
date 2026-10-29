@@ -21,47 +21,49 @@ fn main() -> Result<(), Box<dyn Error>> {
         die("ERROR: Failed to get config file path");
     };
 
-    // Try to read from config file to a string
-    let Ok(user_config) = load_user_config(&config_file_path) else {
-        /* --- If config doesn't exist --- */
-        println!("WARNING: No config file found. Creating a new one.");
-
-        // Create new folder & file
-        if let Err(err) = create_empty_config(&config_file_path) {
-            die(format!("ERROR: Failed to create new config file: {err}").as_str());
-        }
-
-        // Get PS3 IP as trimmed, boxed str
-        let mut ip: Box<str>;
-        loop {
-            flushed_print("Please enter PS3 IP: ");
-            ip = Box::from(read_line_as_string().trim());
-
-            // Shortest possible IP is 7 characters long
-            if ip.len() >= 7 {
+    /* Try to read from config file to a string.
+     * A loop is needed so we can load right after we create the new config file */
+    let user_config: UserConfig;
+    loop {
+        match load_user_config(&config_file_path) {
+            Ok(cfg) => {
+                user_config = cfg;
                 break;
+            },
+            Err(_) => {
+                /* --- If config doesn't exist --- */
+                println!("WARNING: No config file found. Creating a new one.");
+
+                // Create new folder & file
+                if let Err(err) = create_empty_config(&config_file_path) {
+                    die(format!("ERROR: Failed to create new config file: {err}").as_str());
+                }
+
+                // Get PS3 IP as trimmed, boxed str
+                let mut ip: Box<str>;
+                loop {
+                    flushed_print("Please enter PS3 IP: ");
+                    ip = Box::from(read_line_as_string().trim());
+
+                    // Shortest possible IP is 7 characters long
+                    if ip.len() >= 7 {
+                        break;
+                    }
+                }
+
+                dbg!(&ip);
+
+                // Create new settings struct with user-specified IP
+                let user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
+
+                // Write new user_config struct to file for later
+                let toml_str = toml::to_string(&user_config).unwrap();
+                if let Err(err) = std::fs::write(&config_file_path, &toml_str) {
+                    die(format!("ERROR: Failed to write config file: {err}").as_str());
+                }
             }
         }
-
-        dbg!(&ip);
-
-        // Create new settings struct with user-specified IP
-        let user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
-
-        // Write new user_config struct to file for later
-        let toml_str = toml::to_string(&user_config).unwrap();
-        if let Err(err) = std::fs::write(config_file_path, &toml_str) {
-            die(format!("ERROR: Failed to write config file: {err}").as_str());
-        }
-
-        /*
-
-        // Return the toml string as we parse it later
-        toml_str
-        */
-
-        todo!("Handle missing config");
-    };
+    }
 
     dbg!(&user_config);
 
@@ -91,11 +93,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         Ok(()) => (),
         Err(err) => {
             die(format!(
-                "ERROR: Failed to connect to Discord IPC: {err}\n\
+                    "ERROR: Failed to connect to Discord IPC: {err}\n\
                 Please make sure Discord and/or ARRPC is running."
             )
-            .as_str());
-        }
+                .as_str());
+                }
     }
 
     loop {
