@@ -64,6 +64,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     if ip.len() >= 7 {
                         break;
                     }
+                    println!("\nPlease enter a valid IP address.");
                 }
 
                 dbg!(&ip);
