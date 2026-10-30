@@ -25,8 +25,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("INFO: Config path: {}", path_str);
 
     /* Try to read from config file to a string.
-     * A loop is needed so we can load right after we create the new config file */
-
+     * A loop is needed so we can try load again right after we create the new config file */
     let user_config: UserConfig;
     loop {
         match load_user_config(&config_file_path) {
