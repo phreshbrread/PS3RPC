@@ -21,18 +21,33 @@ fn main() -> Result<(), Box<dyn Error>> {
         die("ERROR: Failed to get config file path");
     };
 
+    let path_str: &str = config_file_path.to_str().unwrap();
+    println!("INFO: Config path: {}", path_str);
+
     /* Try to read from config file to a string.
      * A loop is needed so we can load right after we create the new config file */
+
     let user_config: UserConfig;
     loop {
         match load_user_config(&config_file_path) {
             Ok(cfg) => {
                 user_config = cfg;
                 break;
-            },
-            Err(_) => {
+            }
+            Err(err) => {
                 /* --- If config doesn't exist --- */
-                println!("WARNING: No config file found. Creating a new one.");
+                println!("WARNING: A valid config file could not be loaded");
+
+                match err {
+                    ConfigReadError::TomlDeError(err) => {
+                        // Print serde's TOML deserialize error
+                        println!("{err}");
+                    }
+
+                    // Ignore as a fatal IO error will be handled later
+                    ConfigReadError::IoError(_) => (),
+                }
+                println!("INFO: Creating a new config at {path_str}");
 
                 // Create new folder & file
                 if let Err(err) = create_empty_config(&config_file_path) {
@@ -54,7 +69,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                 dbg!(&ip);
 
                 // Create new settings struct with user-specified IP
-                let user_config = UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
+                let user_config =
+                    UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
 
                 // Write new user_config struct to file for later
                 let toml_str = toml::to_string(&user_config).unwrap();
@@ -93,11 +109,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         Ok(()) => (),
         Err(err) => {
             die(format!(
-                    "ERROR: Failed to connect to Discord IPC: {err}\n\
-                Please make sure Discord and/or ARRPC is running."
+                "ERROR: Failed to connect to Discord IPC: {err}\n\
+                INFO: Please make sure Discord and/or ARRPC is running."
             )
-                .as_str());
-                }
+            .as_str());
+        }
     }
 
     loop {
