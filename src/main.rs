@@ -55,6 +55,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
 
                 // Get PS3 IP as trimmed, boxed str
+                // TODO: Verify that string is a valid IP
                 let mut ip: Box<str>;
                 loop {
                     flushed_print("Please enter PS3 IP: ");
