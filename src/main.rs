@@ -58,7 +58,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 let mut ip: Box<str>;
                 loop {
                     flushed_print("Please enter PS3 IP: ");
-                    ip = Box::from(read_line_as_string().trim());
+                    ip = Box::from(read_line_as_string()?.trim());
 
                     // Shortest possible IP is 7 characters long
                     if ip.len() >= 7 {
@@ -73,9 +73,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                 let user_config =
                     UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
 
-                // Write new user_config struct to file for later
-                let toml_str = toml::to_string(&user_config).unwrap();
-                if let Err(err) = std::fs::write(&config_file_path, &toml_str) {
+                // Write config to file
+                if let Err(err) = save_user_config(&user_config, &config_file_path) {
                     die(format!("ERROR: Failed to write config file: {err}").as_str());
                 }
             }

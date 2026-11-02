@@ -82,8 +82,12 @@ pub fn load_user_config(path: &PathBuf) -> Result<UserConfig, ConfigReadError> {
     Ok(cfg)
 }
 
-pub fn save_user_config(cfg: &UserConfig, path: &PathBuf) {
-    todo!();
+pub fn save_user_config(cfg: &UserConfig, path: &PathBuf) -> Result<(), io::Error>{
+    let toml_str = toml::to_string(&cfg).unwrap();
+
+    std::fs::write(&path, &toml_str)?;
+
+    Ok(())
 }
 
 pub fn flushed_print(str: &str) {
@@ -91,11 +95,11 @@ pub fn flushed_print(str: &str) {
     std::io::stdout().flush().unwrap();
 }
 
-pub fn read_line_as_string() -> String {
+pub fn read_line_as_string() -> Result<String, io::Error> {
     let mut input = String::new();
-    std::io::stdin().read_line(&mut input).unwrap();
+    std::io::stdin().read_line(&mut input)?;
 
-    return input;
+    Ok(input)
 }
 
 pub fn any_key_continue() {
