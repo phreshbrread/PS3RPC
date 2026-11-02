@@ -10,6 +10,10 @@ use std::{
 
 // http://<PS3 ID>/klic.ps3 is the main Webman info page we need
 
+/* TODO: Input listener thread
+ * Listen for a specified key, which, when activated, will allow the user to stop connection
+ * attempt and enter a new IP. */
+
 /* TODO: Allow for changing IP without touching config file
  * Do this with a --new-ip flag or something */
 fn main() -> Result<(), Box<dyn Error>> {
@@ -82,17 +86,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     dbg!(&user_config);
-
-    // Parse toml to struct
-    // TODO: Account for blank IP
-    //let user_config: UserConfig = match toml::from_str(&cfg_contents) {
-    //    Ok(contents) => contents,
-    //    Err(err) => {
-    //        println!("Failed to read settings.toml: {err}");
-    //        any_key_continue();
-    //        process::exit(1);
-    //    }
-    //};
 
     let mut connected_to_ps3 = false;
     let connection_message = format!(
