@@ -82,7 +82,7 @@ pub fn load_user_config(path: &PathBuf) -> Result<UserConfig, ConfigReadError> {
     Ok(cfg)
 }
 
-pub fn save_user_config(cfg: &UserConfig, path: &PathBuf) -> Result<(), io::Error>{
+pub fn save_user_config(cfg: &UserConfig, path: &PathBuf) -> Result<(), io::Error> {
     let toml_str = toml::to_string(&cfg).unwrap();
 
     std::fs::write(&path, &toml_str)?;

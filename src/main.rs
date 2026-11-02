@@ -88,10 +88,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     dbg!(&user_config);
 
     let mut connected_to_ps3 = false;
-    let connection_message = format!(
-        "http://{}/notify.ps3mapi?msg=Rich+Presence+connection+established&icon=0&snd=",
-        user_config.ps3_ip
-    );
+    //let connection_message = format!(
+    //    "http://{}/notify.ps3mapi?msg=Rich+Presence+connection+established&icon=0&snd=",
+    //    user_config.ps3_ip
+    //);
     let webman_url = format!("http://{}/klic.ps3", user_config.ps3_ip);
 
     let mut current_game: Option<CurrentGame>;
@@ -102,11 +102,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         Ok(()) => (),
         Err(err) => {
             die(format!(
-                "ERROR: Failed to connect to Discord IPC: {err}\n\
+                    "ERROR: Failed to connect to Discord IPC: {err}\n\
                 INFO: Please make sure Discord and/or ARRPC is running."
             )
-            .as_str());
-        }
+                .as_str());
+                }
     }
 
     loop {
@@ -115,7 +115,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         if !connected_to_ps3 {
             println!("Attempting to connect to PS3 ({})", user_config.ps3_ip);
 
-            match ureq::get(connection_message.as_str()).call() {
+            match establish_connection(&user_config.ps3_ip) {
                 Ok(_) => {
                     println!("Connected to PS3 ({})", user_config.ps3_ip);
                     connected_to_ps3 = true;
@@ -201,4 +201,20 @@ fn main() -> Result<(), Box<dyn Error>> {
         // Delay before restarting
         thread::sleep(user_config.sleep_duration);
     }
+}
+
+pub fn establish_connection(ip: &str) -> Result<ureq::http::Response<ureq::Body>, ureq::Error>{
+    todo!("Properly test establish_connection()");
+    let url = format!("http://{}/notify.ps3mapi?msg=Rich+Presence+connection+established&icon=0&snd=", ip);
+
+    let response = ureq::get(url).call()?;
+
+    return Ok(response);
+}
+
+pub fn query_game(msg: &str, ip: &str) {}
+
+pub enum ConnectionType {
+    Establish(Box<str>, u8),
+    QueryGame(Box<str>),
 }
