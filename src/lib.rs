@@ -1,11 +1,10 @@
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use std::{
-    fs,
+    fmt, fs,
     io::{self, Write},
     path::PathBuf,
     time::Duration,
-    fmt,
 };
 
 #[derive(Parser, Debug)]
@@ -103,6 +102,17 @@ pub fn read_line_as_string() -> Result<String, io::Error> {
     Ok(input)
 }
 
+pub fn establish_connection(ip: &str) -> Result<ureq::http::Response<ureq::Body>, ureq::Error> {
+    let url = format!(
+        "http://{}/notify.ps3mapi?msg=Rich+Presence+connection+established&icon=0&snd=",
+        ip
+    );
+
+    let response = ureq::get(url).call()?;
+
+    return Ok(response);
+}
+
 pub fn any_key_continue() {
     flushed_print("Press enter to continue.");
     let _ = io::stdin().read_line(&mut String::new());
@@ -138,7 +148,6 @@ impl fmt::Display for ConfigWriteError {
         write!(fmt, "{self}")
     }
 }
-
 
 #[derive(Debug)]
 pub enum ConfigReadError {

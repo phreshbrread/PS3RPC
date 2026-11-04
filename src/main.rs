@@ -1,14 +1,10 @@
 use clap::Parser;
 use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity};
 use ps3rpc::*;
-use std::{
-    error::Error,
-    fs::{self, File},
-    process, thread,
-    time::Duration,
-};
+use std::{error::Error, thread, time::Duration};
 
 // http://<PS3 ID>/klic.ps3 is the main Webman info page we need
+// TODO: Use cpursc.ps3 instead
 
 /* TODO: Input listener thread
  * Listen for a specified key, which, when activated, will allow the user to stop connection
@@ -88,10 +84,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     dbg!(&user_config);
 
     let mut connected_to_ps3 = false;
-    //let connection_message = format!(
-    //    "http://{}/notify.ps3mapi?msg=Rich+Presence+connection+established&icon=0&snd=",
-    //    user_config.ps3_ip
-    //);
     let webman_url = format!("http://{}/klic.ps3", user_config.ps3_ip);
 
     let mut current_game: Option<CurrentGame>;
@@ -102,11 +94,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         Ok(()) => (),
         Err(err) => {
             die(format!(
-                    "ERROR: Failed to connect to Discord IPC: {err}\n\
+                "ERROR: Failed to connect to Discord IPC: {err}\n\
                 INFO: Please make sure Discord and/or ARRPC is running."
             )
-                .as_str());
-                }
+            .as_str());
+        }
     }
 
     loop {
@@ -135,6 +127,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
 
         // Handle page manipulation in it's own scope so we can drop whatever data we don't need
+        // TODO: Extract into function
         {
             let page: String = match ureq::get(webman_url.as_str()).call() {
                 Ok(mut response) => response.body_mut().read_to_string()?,
@@ -203,16 +196,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 }
 
-pub fn establish_connection(ip: &str) -> Result<ureq::http::Response<ureq::Body>, ureq::Error>{
-    todo!("Properly test establish_connection()");
-    let url = format!("http://{}/notify.ps3mapi?msg=Rich+Presence+connection+established&icon=0&snd=", ip);
-
-    let response = ureq::get(url).call()?;
-
-    return Ok(response);
+pub fn query_game(ip: &str) {
+    todo!();
 }
-
-pub fn query_game(msg: &str, ip: &str) {}
 
 pub enum ConnectionType {
     Establish(Box<str>, u8),
