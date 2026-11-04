@@ -5,6 +5,7 @@ use std::{
     io::{self, Write},
     path::PathBuf,
     time::Duration,
+    fmt,
 };
 
 #[derive(Parser, Debug)]
@@ -82,8 +83,8 @@ pub fn load_user_config(path: &PathBuf) -> Result<UserConfig, ConfigReadError> {
     Ok(cfg)
 }
 
-pub fn save_user_config(cfg: &UserConfig, path: &PathBuf) -> Result<(), io::Error> {
-    let toml_str = toml::to_string(&cfg).unwrap();
+pub fn save_user_config(cfg: &UserConfig, path: &PathBuf) -> Result<(), ConfigWriteError> {
+    let toml_str = toml::to_string(&cfg)?;
 
     std::fs::write(&path, &toml_str)?;
 
@@ -131,6 +132,13 @@ impl From<std::io::Error> for ConfigWriteError {
         ConfigWriteError::IoError(value)
     }
 }
+
+impl fmt::Display for ConfigWriteError {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(fmt, "{self}")
+    }
+}
+
 
 #[derive(Debug)]
 pub enum ConfigReadError {
