@@ -94,11 +94,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         Ok(()) => (),
         Err(err) => {
             die(format!(
-                "ERROR: Failed to connect to Discord IPC: {err}\n\
+                    "ERROR: Failed to connect to Discord IPC: {err}\n\
                 INFO: Please make sure Discord and/or ARRPC is running."
             )
-            .as_str());
-        }
+                .as_str());
+                }
     }
 
     loop {
@@ -126,8 +126,18 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
 
+        match query_game(&user_config.ps3_ip) {
+            Ok(game) => {
+                todo!("{:#?}", game);
+            }
+            Err(err) => {
+                todo!("{err}");
+            }
+        }
+
         // Handle page manipulation in it's own scope so we can drop whatever data we don't need
         // TODO: Extract into function
+        /*
         {
             let page: String = match ureq::get(webman_url.as_str()).call() {
                 Ok(mut response) => response.body_mut().read_to_string()?,
@@ -159,6 +169,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
+        */
 
         // The following only runs if current_game is Some()
         if let Some(current_game) = current_game {
@@ -196,11 +207,33 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 }
 
-pub fn query_game(ip: &str) {
-    todo!();
-}
+pub fn query_game(ip: &str) -> Result<Option<CurrentGame>, ureq::Error> {
+    let url = format!("http://{}/klic.ps3", ip);
 
-pub enum ConnectionType {
-    Establish(Box<str>, u8),
-    QueryGame(Box<str>),
+    // Get the raw klic page from the PS3
+    let page: String = match ureq::get(url).call() {
+        Ok(response) => response.into_body().read_to_string()?,
+        Err(err) => todo!("{err}\nHandle ureq::get(ip).call() failure"),
+    };
+
+    dbg!(&page);
+
+    let current_game: Option<CurrentGame>;
+
+    // Parse the page, returning either Some or None
+    if page.contains("KLIC: Not in-game!") {
+        current_game = None;
+    } else {
+        let (mut trimmed_page, _) = page.split_once("</H2>").unwrap();
+        (_, trimmed_page) = trimmed_page.split_once("<h2>").unwrap();
+
+        if trimmed_page.len() > 1 {
+            let (id, game) = trimmed_page.split_at(10);
+            current_game = Some(CurrentGame::new(id.trim_end(), game));
+        } else {
+            current_game = None;
+        }
+    }
+
+    return Ok(current_game);
 }
