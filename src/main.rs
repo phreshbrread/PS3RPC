@@ -4,7 +4,7 @@ use ps3rpc::*;
 use std::{error::Error, thread, time::Duration};
 
 // http://<PS3 ID>/klic.ps3 is the main Webman info page we need
-// TODO: Use cpursc.ps3 instead
+// TODO: Use cpursx.ps3 instead
 
 /* TODO: Input listener thread
  * Listen for a specified key, which, when activated, will allow the user to stop connection
