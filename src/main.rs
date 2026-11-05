@@ -120,8 +120,13 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
 
-        // query_game returns a Result<Option<CurrentGame>, ureq::Error>
-        let current_game = query_game(&user_config.ps3_ip);
+        // Unwrap the Result<> from query_game() into an Option<CurrentGame>
+        let current_game = match query_game(&user_config.ps3_ip) {
+            Ok(game) => game,
+            Err(err) => {
+                todo!("{:#?}", err);
+            }
+        };
 
         // The following only runs if current_game is Some()
         if let Some(current_game) = current_game {
