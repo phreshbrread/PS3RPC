@@ -90,15 +90,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Create Discord IPC Client
     let mut client = DiscordIpcClient::new("1535304909019418705");
-    match client.connect() {
-        Ok(()) => (),
-        Err(err) => {
-            die(format!(
-                    "ERROR: Failed to connect to Discord IPC: {err}\n\
-                INFO: Please make sure Discord and/or ARRPC is running."
-            )
-                .as_str());
-                }
+    if let Err(err) = client.connect() {
+        die(format!(
+            "ERROR: Failed to connect to Discord IPC: {err}\n\
+             INFO: Please make sure Discord and/or ARRPC is running."
+        )
+        .as_str());
     }
 
     loop {
