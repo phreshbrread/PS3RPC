@@ -123,50 +123,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
 
-        match query_game(&user_config.ps3_ip) {
-            Ok(game) => {
-                todo!("{:#?}", game);
-            }
-            Err(err) => {
-                todo!("{err}");
-            }
-        }
-
-        // Handle page manipulation in it's own scope so we can drop whatever data we don't need
-        // TODO: Extract into function
-        /*
-        {
-            let page: String = match ureq::get(webman_url.as_str()).call() {
-                Ok(mut response) => response.body_mut().read_to_string()?,
-                Err(err) => {
-                    println!(
-                        "Failed to connect to PS3 ({}): {}",
-                        user_config.ps3_ip,
-                        err.into_io()
-                    );
-
-                    // Reset connection status and end loop early
-                    connected_to_ps3 = false;
-                    thread::sleep(user_config.reconnect_delay);
-                    continue;
-                }
-            };
-
-            if page.contains("KLIC: Not in-game!") {
-                current_game = None;
-            } else {
-                let (mut trimmed_page, _) = page.split_once("</H2>").unwrap();
-                (_, trimmed_page) = trimmed_page.split_once("<h2>").unwrap();
-
-                if trimmed_page.len() > 1 {
-                    let (id, game) = trimmed_page.split_at(10);
-                    current_game = Some(CurrentGame::new(id.trim_end(), game));
-                } else {
-                    current_game = None;
-                }
-            }
-        }
-        */
+        // query_game returns a Result<Option<CurrentGame>, ureq::Error>
+        let current_game = query_game(&user_config.ps3_ip);
 
         // The following only runs if current_game is Some()
         if let Some(current_game) = current_game {
@@ -234,3 +192,37 @@ pub fn query_game(ip: &str) -> Result<Option<CurrentGame>, ureq::Error> {
 
     return Ok(current_game);
 }
+
+/* -- Old page handling code --
+{
+    let page: String = match ureq::get(webman_url.as_str()).call() {
+        Ok(mut response) => response.body_mut().read_to_string()?,
+        Err(err) => {
+            println!(
+                "Failed to connect to PS3 ({}): {}",
+                user_config.ps3_ip,
+                err.into_io()
+            );
+
+            // Reset connection status and end loop early
+            connected_to_ps3 = false;
+            thread::sleep(user_config.reconnect_delay);
+            continue;
+        }
+    };
+
+    if page.contains("KLIC: Not in-game!") {
+        current_game = None;
+    } else {
+        let (mut trimmed_page, _) = page.split_once("</H2>").unwrap();
+        (_, trimmed_page) = trimmed_page.split_once("<h2>").unwrap();
+
+        if trimmed_page.len() > 1 {
+            let (id, game) = trimmed_page.split_at(10);
+            current_game = Some(CurrentGame::new(id.trim_end(), game));
+        } else {
+            current_game = None;
+        }
+    }
+}
+*/
