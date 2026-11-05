@@ -113,6 +113,38 @@ pub fn establish_connection(ip: &str) -> Result<ureq::http::Response<ureq::Body>
     return Ok(response);
 }
 
+pub fn query_game(ip: &str) -> Result<Option<CurrentGame>, ureq::Error> {
+    // TODO: Use cpursx.ps3 for game info instead of klic
+    let url = format!("http://{}/klic.ps3", ip);
+
+    // Get the raw klic page from the PS3
+    let page: String = match ureq::get(url).call() {
+        Ok(response) => response.into_body().read_to_string()?,
+        Err(err) => todo!("{err}\nHandle ureq::get(ip).call() failure"),
+    };
+
+    dbg!(&page);
+
+    let current_game: Option<CurrentGame>;
+
+    // Parse the page, returning either Some or None
+    if page.contains("KLIC: Not in-game!") {
+        current_game = None;
+    } else {
+        let (mut trimmed_page, _) = page.split_once("</H2>").unwrap();
+        (_, trimmed_page) = trimmed_page.split_once("<h2>").unwrap();
+
+        if trimmed_page.len() > 1 {
+            let (id, game) = trimmed_page.split_at(10);
+            current_game = Some(CurrentGame::new(id.trim_end(), game));
+        } else {
+            current_game = None;
+        }
+    }
+
+    return Ok(current_game);
+}
+
 pub fn any_key_continue() {
     flushed_print("Press enter to continue.");
     let _ = io::stdin().read_line(&mut String::new());
