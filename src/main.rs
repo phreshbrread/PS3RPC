@@ -14,7 +14,6 @@ use std::{error::Error, thread, time::Duration};
  * Do this with a --new-ip flag or something */
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
-    dbg!(&args);
 
     // Get config file path
     let Some(config_file_path) = get_config_path() else {
@@ -67,8 +66,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                     println!("\nPlease enter a valid IP address.");
                 }
 
-                dbg!(&ip);
-
                 // Create new settings struct with user-specified IP
                 let user_config =
                     UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
@@ -80,8 +77,6 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
     }
-
-    dbg!(&user_config);
 
     let mut connected_to_ps3 = false;
     let webman_url = format!("http://{}/klic.ps3", user_config.ps3_ip);
