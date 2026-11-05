@@ -11,7 +11,6 @@ use std::{error::Error, thread, time::Duration};
  * Do this with a --new-ip flag or something */
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
-    dbg!(&args);
 
     // Get config file path
     let Some(config_file_path) = get_config_path() else {
@@ -64,8 +63,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                     println!("\nPlease enter a valid IP address.");
                 }
 
-                dbg!(&ip);
-
                 // Create new settings struct with user-specified IP
                 let user_config =
                     UserConfig::new(&ip, Duration::from_secs(10), Duration::from_secs(20));
@@ -78,13 +75,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
-    dbg!(&user_config);
-
-    let mut connected_to_ps3 = false;
-    let webman_url = format!("http://{}/klic.ps3", user_config.ps3_ip);
-
-    let mut current_game: Option<CurrentGame>;
-
     // Create Discord IPC Client
     let mut client = DiscordIpcClient::new("1535304909019418705");
     if let Err(err) = client.connect() {
@@ -95,6 +85,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .as_str());
     }
 
+    let mut connected_to_ps3 = false;
     loop {
         // TODO: Consolidate connection attempts
         // Send connection message to PS3 if we haven't already
@@ -163,37 +154,3 @@ fn main() -> Result<(), Box<dyn Error>> {
         thread::sleep(user_config.sleep_duration);
     }
 }
-
-/* -- Old page handling code --
-{
-    let page: String = match ureq::get(webman_url.as_str()).call() {
-        Ok(mut response) => response.body_mut().read_to_string()?,
-        Err(err) => {
-            println!(
-                "Failed to connect to PS3 ({}): {}",
-                user_config.ps3_ip,
-                err.into_io()
-            );
-
-            // Reset connection status and end loop early
-            connected_to_ps3 = false;
-            thread::sleep(user_config.reconnect_delay);
-            continue;
-        }
-    };
-
-    if page.contains("KLIC: Not in-game!") {
-        current_game = None;
-    } else {
-        let (mut trimmed_page, _) = page.split_once("</H2>").unwrap();
-        (_, trimmed_page) = trimmed_page.split_once("<h2>").unwrap();
-
-        if trimmed_page.len() > 1 {
-            let (id, game) = trimmed_page.split_at(10);
-            current_game = Some(CurrentGame::new(id.trim_end(), game));
-        } else {
-            current_game = None;
-        }
-    }
-}
-*/

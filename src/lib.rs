@@ -113,8 +113,14 @@ pub fn establish_connection(ip: &str) -> Result<ureq::http::Response<ureq::Body>
     return Ok(response);
 }
 
+// TODO: Replace query_game() with this new version that uses cpursx.ps3
+pub fn query_game_cpursx(ip: &str) -> Result<Option<CurrentGame>, ureq::Error> {
+    let url = format!("http://{}/cpursx.ps3", ip);
+    todo!("Finish query_game_cpursx()");
+    Ok(Some(CurrentGame::new("test", "test")))
+}
+
 pub fn query_game(ip: &str) -> Result<Option<CurrentGame>, ureq::Error> {
-    // TODO: Use cpursx.ps3 for game info instead of klic
     let url = format!("http://{}/klic.ps3", ip);
 
     // Get the raw klic page from the PS3
@@ -122,8 +128,6 @@ pub fn query_game(ip: &str) -> Result<Option<CurrentGame>, ureq::Error> {
         Ok(response) => response.into_body().read_to_string()?,
         Err(err) => todo!("{err}\nHandle ureq::get(ip).call() failure"),
     };
-
-    dbg!(&page);
 
     let current_game: Option<CurrentGame>;
 
